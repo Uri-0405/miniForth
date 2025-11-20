@@ -1,0 +1,25 @@
+# Fitxers generats per ANTLR
+forthLexer.py
+forthParser.py
+forthListener.py
+forthVisitor.py
+*.tokens
+*.interp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
