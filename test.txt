@@ -1,0 +1,445 @@
+Joc de proves per a l'intèrpret de Forth
+==========================================
+
+>>> from forth import interpret
+
+# Pila bàsica
+
+>>> interpret('.s')
+[]
+
+>>> interpret('1 2 3 .s')
+[1, 2, 3]
+
+>>> interpret('0 .s')
+[0]
+
+>>> interpret('-5 .s')
+[-5]
+
+>>> interpret('1000 .s')
+[1000]
+
+>>> interpret('1 2 3 .')
+3
+
+>>> interpret('1 2 3 . . . .s')
+3
+2
+1
+[]
+
+>>> interpret('1 . .')
+1
+Error: Stack is empty
+
+>>> interpret('.s')
+[]
+
+# Aritmètica
+
+>>> interpret('1 2 + .')
+3
+
+>>> interpret('0 0 + .')
+0
+
+>>> interpret('-1 -2 + .')
+-3
+
+>>> interpret('5 2 - .')
+3
+
+>>> interpret('2 5 - .')
+-3
+
+>>> interpret('3 4 * .')
+12
+
+>>> interpret('5 0 * .')
+0
+
+>>> interpret('-3 -4 * .')
+12
+
+>>> interpret('8 2 / .')
+4
+
+>>> interpret('8 1 / .')
+8
+
+>>> interpret('-8 2 / .')
+-4
+
+>>> interpret('-8 -2 / .')
+4
+
+>>> interpret('7 2 mod .')
+1
+
+>>> interpret('0 5 mod .')
+0
+
+>>> interpret('-7 3 mod .')
+2
+
+>>> interpret('7 -3 mod .')
+-2
+
+# Manipulació de pila
+
+>>> interpret('1 2 3 .s swap .s')
+[1, 2, 3]
+[1, 3, 2]
+
+>>> interpret('1 2 swap .s')
+[2, 1]
+
+>>> interpret('1 2 3 4 .s 2swap .s')
+[1, 2, 3, 4]
+[3, 4, 1, 2]
+
+>>> interpret('1 2 .s dup .s')
+[1, 2]
+[1, 2, 2]
+
+>>> interpret('0 dup .s')
+[0, 0]
+
+>>> interpret('1 2 3 .s 2dup .s')
+[1, 2, 3]
+[1, 2, 3, 2, 3]
+
+>>> interpret('1 2 .s over .s')
+[1, 2]
+[1, 2, 1]
+
+>>> interpret('1 2 3 over .s')
+[1, 2, 3, 2]
+
+>>> interpret('1 2 3 4 .s 2over .s')
+[1, 2, 3, 4]
+[1, 2, 3, 4, 1, 2]
+
+>>> interpret('1 2 3 .s rot .s')
+[1, 2, 3]
+[2, 3, 1]
+
+>>> interpret('1 2 3 4 rot .s')
+[1, 3, 4, 2]
+
+>>> interpret('1 2 .s drop .s')
+[1, 2]
+[1]
+
+>>> interpret('1 drop .s')
+[]
+
+>>> interpret('1 2 3 .s 2drop .s')
+[1, 2, 3]
+[1]
+
+>>> interpret('1 2 2drop .s')
+[]
+
+# Relacionals
+
+>>> interpret('2 3 < .')
+-1
+
+>>> interpret('3 2 < .')
+0
+
+>>> interpret('2 2 < .')
+0
+
+>>> interpret('-1 0 < .')
+-1
+
+>>> interpret('3 2 > .')
+-1
+
+>>> interpret('2 3 > .')
+0
+
+>>> interpret('2 2 > .')
+0
+
+>>> interpret('0 -1 > .')
+-1
+
+>>> interpret('2 2 = .')
+-1
+
+>>> interpret('2 3 = .')
+0
+
+>>> interpret('0 0 = .')
+-1
+
+>>> interpret('-1 -1 = .')
+-1
+
+>>> interpret('2 3 <> .')
+-1
+
+>>> interpret('2 2 <> .')
+0
+
+>>> interpret('0 1 <> .')
+-1
+
+# Booleans
+
+>>> interpret('-1 -1 and .')
+-1
+
+>>> interpret('-1 0 and .')
+0
+
+>>> interpret('0 0 and .')
+0
+
+>>> interpret('1 -1 and .')
+1
+
+>>> interpret('-1 0 or .')
+-1
+
+>>> interpret('0 0 or .')
+0
+
+>>> interpret('-1 -1 or .')
+-1
+
+>>> interpret('1 0 or .')
+1
+
+>>> interpret('0 not .')
+-1
+
+>>> interpret('-1 not .')
+0
+
+>>> interpret('1 not .')
+-2
+
+# Funcions
+
+>>> data = '\n'.join([
+... ': doble 2 * ;',
+... '4 doble .'
+... ])
+>>> interpret(data)
+8
+
+>>> data = '\n'.join([
+... ': suma + ;',
+... '3 4 suma .'
+... ])
+>>> interpret(data)
+7
+
+>>> data = '\n'.join([
+... ': doble 2 * ;',
+... ': f doble 1 + ;',
+... '3 f .'
+... ])
+>>> interpret(data)
+7
+
+>>> data = '\n'.join([
+... ': abs dup 0 < if 0 swap - endif ;',
+... '-5 abs .'
+... ])
+>>> interpret(data)
+5
+
+>>> data = '\n'.join([
+... ': min 2dup < if drop else swap drop endif ;',
+... '3 2 min .'
+... ])
+>>> interpret(data)
+2
+
+>>> data = '\n'.join([
+... ': max 2dup > if drop else swap drop endif ;',
+... '3 2 max .'
+... ])
+>>> interpret(data)
+3
+
+>>> data = '\n'.join([
+... ': signe dup 0 < if drop -1 else dup 0 > if drop 1 else drop 0 endif endif ;',
+... '-2 signe .s'
+... ])
+>>> interpret(data)
+[-1]
+
+>>> data = '\n'.join([
+... ': signe dup 0 < if drop -1 else dup 0 > if drop 1 else drop 0 endif endif ;',
+... '0 signe .s'
+... ])
+>>> interpret(data)
+[0]
+
+>>> data = '\n'.join([
+... ': signe dup 0 < if drop -1 else dup 0 > if drop 1 else drop 0 endif endif ;',
+... '5 signe .s'
+... ])
+>>> interpret(data)
+[1]
+
+>>> data = '\n'.join([
+... ': quadrat dup * ;',
+... '5 quadrat .'
+... ])
+>>> interpret(data)
+25
+
+>>> data = '\n'.join([
+... ': inc 1 + ;',
+... ': doble inc inc ;',
+... '3 doble .'
+... ])
+>>> interpret(data)
+5
+
+# Recursivitat
+
+>>> data = '\n'.join([
+... ': faux dup rot * swap 1 - dup 2 < if drop else recurse endif ;',
+... ': factorial dup 2 < if drop 1 else dup 1 - faux endif ;',
+... '4 factorial .'
+... ])
+>>> interpret(data)
+24
+
+>>> data = '\n'.join([
+... ': faux dup rot * swap 1 - dup 2 < if drop else recurse endif ;',
+... ': factorial dup 2 < if drop 1 else dup 1 - faux endif ;',
+... '0 factorial .'
+... ])
+>>> interpret(data)
+1
+
+>>> data = '\n'.join([
+... ': faux dup rot * swap 1 - dup 2 < if drop else recurse endif ;',
+... ': factorial dup 2 < if drop 1 else dup 1 - faux endif ;',
+... '1 factorial .'
+... ])
+>>> interpret(data)
+1
+
+>>> data = '\n'.join([
+... ': faux dup rot * swap 1 - dup 2 < if drop else recurse endif ;',
+... ': factorial dup 2 < if drop 1 else dup 1 - faux endif ;',
+... '2 factorial .'
+... ])
+>>> interpret(data)
+2
+
+>>> data = '\n'.join([
+... ': faux dup rot * swap 1 - dup 2 < if drop else recurse endif ;',
+... ': factorial dup 2 < if drop 1 else dup 1 - faux endif ;',
+... '3 factorial .'
+... ])
+>>> interpret(data)
+6
+
+>>> data = '\n'.join([
+... ': fib dup 2 < if else dup 1 - recurse swap 2 - recurse + endif ;',
+... '6 fib .'
+... ])
+>>> interpret(data)
+8
+
+# Condicionals
+
+>>> data = '\n'.join([
+... ': test dup 0 > if 100 . endif ;',
+... '5 test'
+... ])
+>>> interpret(data)
+100
+
+>>> data = '\n'.join([
+... ': test dup 0 > if 100 . endif ;',
+... '-1 test'
+... ])
+>>> interpret(data)
+
+>>> data = '\n'.join([
+... ': test dup 0 > if 100 . else 200 . endif ;',
+... '-1 test'
+... ])
+>>> interpret(data)
+200
+
+>>> data = '\n'.join([
+... ': test dup 0 > if 100 . else 200 . endif ;',
+... '5 test'
+... ])
+>>> interpret(data)
+100
+
+>>> data = '\n'.join([
+... ': test dup 0 > if dup 10 > if 999 . else 888 . endif else 777 . endif ;',
+... '15 test'
+... ])
+>>> interpret(data)
+999
+
+>>> data = '\n'.join([
+... ': test dup 0 > if dup 10 > if 999 . else 888 . endif else 777 . endif ;',
+... '5 test'
+... ])
+>>> interpret(data)
+888
+
+>>> data = '\n'.join([
+... ': test dup 0 > if dup 10 > if 999 . else 888 . endif else 777 . endif ;',
+... '-1 test'
+... ])
+>>> interpret(data)
+777
+
+>>> data = '\n'.join([
+... ': test dup 0 > if 2 * else + 1 endif ;',
+... '3 4 test .'
+... ])
+>>> interpret(data)
+8
+
+# Errors
+
+>>> interpret('5 0 / .')
+Error: division by zero
+
+>>> interpret('5 0 mod .')
+Error: integer division or modulo by zero
+
+>>> interpret('.s drop .s')
+[]
+Error: Stack is empty
+
+>>> interpret('swap .s')
+Error: Stack is empty
+
+>>> interpret('dup .s')
+Error: Stack is empty
+
+>>> interpret('over .s')
+Error: Stack is empty
+
+>>> interpret('rot .s')
+Error: Stack is empty
+
+>>> interpret('drop .s')
+Error: Stack is empty
+
+>>> interpret('undefined .s')
+Error: Undefined word: undefined
+
+>>> interpret('1 2 + . \\ comentari')
+3

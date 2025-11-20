@@ -1,18 +1,18 @@
 # Makefile per a l'intèrpret de Forth
 
 # Variables
-ANTLR = antlr4
+ANTLR = java -jar antlr-4.13.1-complete.jar
 PYTHON = python3
 GRAMMAR = forth.g4
 TEST_FILE = test.txt
 
 # Fitxers generats per ANTLR
-GENERATED = forthLexer.py forthParser.py forthListener.py forthVisitor.py
+GENERATED = forthLexer.py forthParser.py forthVisitor.py forthLexer.tokens forthParser.tokens forth.tokens forth.interp forthLexer.interp
 
 .PHONY: all antlr test clean
 
-# Target per defecte
-all: antlr
+# Target per defecte: genera fitxers i executa tests
+all: test
 
 # Generar els fitxers Python a partir de la gramàtica ANTLR
 antlr: $(GRAMMAR)
